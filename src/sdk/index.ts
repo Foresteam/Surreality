@@ -1,5 +1,6 @@
 import type Surreal from 'surrealdb.js';
 import { from } from './statements/select.js';
+import type { Model } from './schemas.js';
 
 type Surql2Arg = string | number | undefined | null | symbol;
 export class Surql2 {
@@ -36,7 +37,7 @@ type UndefIndex<T extends any[], I extends number> = {
 };
 type SpliceTuple<T extends any[], I extends number> = FilterUndefined<UndefIndex<T, I>>;
 
-export const DB = (db: Surreal) => ({
+export const DB = <Create extends Model<object>>(db: Surreal) => ({
   from: from(db),
   surql: <T>(template: TemplateStringsArray, ...args: (string | number | undefined | null)[]): Promise<T[]> => {
     let t = template[0];
@@ -46,5 +47,12 @@ export const DB = (db: Surreal) => ({
     return db.query(t, Object.fromEntries(args.map((a, i) => [`a${i}`, a]))).then(rs => rs.at(0)?.result) as Promise<object> as Promise<
       T[]
     >;
-  }
+  },
+  create: <T extends Create, C extends T['model']>(args: {
+    table: T['table'];
+    query: Omit<C, 'id'> & { id?: string };
+  }): Promise<T['model'][]> =>
+    db.create(args.table, args.query as object as Record<string, unknown>) as Promise<object> as Promise<T['model'][]>,
+  merge: <T extends Create>(args: Omit<T, 'model'> & { query: Partial<T['model']> }): Promise<T['model'][]> =>
+    db.merge(args.table, args.query as object as Record<string, unknown>) as Promise<object> as Promise<T['model'][]>
 });

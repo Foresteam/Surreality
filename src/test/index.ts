@@ -4,20 +4,6 @@ import type * as Schemas from './schemas.js';
 
 const db = new Surreal('http://127.0.0.1:8000/rpc');
 
-function TSW(db: Surreal) {
-  return {
-    create: <T extends Schemas.create, C extends T['model']>(args: {
-      table: T['table'];
-      query: Omit<C, 'id'> & { id?: string };
-    }): Promise<T['model'][]> =>
-      db.create(args.table, args.query as object as Record<string, unknown>) as Promise<object> as Promise<T['model'][]>,
-    merge: <T extends Schemas.create>(args: Omit<T, 'model'> & { query: Partial<T['model']> }): Promise<T['model'][]> =>
-      db.merge(args.table, args.query as object as Record<string, unknown>) as Promise<object> as Promise<T['model'][]>,
-    select: <T extends Schemas.create>(args: Partial<T> & { table: string; key?: string }): Promise<T['model'][]> =>
-      db.select(args.table) as Promise<object> as Promise<T['model'][]>
-  };
-}
-
 (async () => {
   await db.signin({
     user: 'root',
@@ -25,31 +11,28 @@ function TSW(db: Surreal) {
   });
   await db.use({ db: 'test', ns: 'test' });
 
-  const tsw = TSW(db);
+  const surreality = DB<Schemas.create>(db);
   const mom = (
-    await tsw.create<Schemas.CreateHuman, Schemas.Orphan>({
+    await surreality.create<Schemas.CreateHuman, Schemas.Orphan>({
       table: 'human',
       query: {
         name: 'The',
         surname: 'Mon',
-        penis: null,
         mother: null
       }
     })
   ).at(0);
   const vadid = (
-    await tsw.create({
+    await surreality.create({
       table: 'human',
       query: {
         name: 'The',
         surname: 'Vadid',
-        penis: null,
         mother: mom?.id as unknown as null
       }
     })
   ).at(0);
 
-  const surreality = DB(db);
   console.log(await surreality.from<Schemas.CreateHuman>({ table: 'human' }).select().fetch('mother').end());
   // const surql = surqlNew(db);
   // console.log((await surql`select * from ${vadid?.id} fetch mother;`).at(0));
