@@ -17,23 +17,23 @@ export const begin = <T extends Model<object>>(db: Surreal) => ({
 
     query.push(() => (_vars.toFetch ? `fetch ${_vars.toFetch.join(', ')}` : ''));
 
-    return { vars: _vars, methods: _methods, query };
+    return [_vars, _methods, query] as [typeof _vars, typeof _methods, typeof query];
   },
   withLimit: <Vars extends object, Methods extends object>(vars: Vars, methods: Methods, query: Array<(surql2: Surql2) => string>) => {
     const theLimit = undefined as undefined | number;
     const _vars = vars as Vars & { theLimit: typeof theLimit };
     _vars.theLimit = theLimit;
-    const fetch = function (this: Methods, limit: number) {
+    const limit = function (this: Methods, limit: number) {
       _vars.theLimit = limit;
       return this;
     };
 
-    const _methods = methods as Methods & { fetch: typeof fetch };
-    _methods.fetch = fetch;
+    const _methods = methods as Methods & { limit: typeof limit };
+    _methods.limit = limit;
 
     query.push(() => (_vars.theLimit ? `limit ${_vars.theLimit}` : ''));
 
-    return { vars: _vars, methods: _methods, query };
+    return [_vars, _methods, query] as [typeof _vars, typeof _methods, typeof query];
   },
   withStart: <Vars extends object, Methods extends object>(vars: Vars, methods: Methods, query: Array<(surql2: Surql2) => string>) => {
     const startFrom = undefined as undefined | number;
@@ -49,7 +49,7 @@ export const begin = <T extends Model<object>>(db: Surreal) => ({
 
     query.push(surql2 => (_vars.startFrom ? `start at ${surql2.interpolate(_vars.startFrom)}` : ''));
 
-    return { vars: _vars, methods: _methods, query };
+    return [_vars, _methods, query] as [typeof _vars, typeof _methods, typeof query];
   },
   withOrder: <Vars extends object, Methods extends object>(vars: Vars, methods: Methods, query: Array<(surql2: Surql2) => string>) => {
     const theOrder = undefined as undefined | { order: 'ASC' | 'DESC'; by: (keyof T['model'])[] };
@@ -65,16 +65,17 @@ export const begin = <T extends Model<object>>(db: Surreal) => ({
 
     query.push(() => (_vars.theOrder ? `order by ${_vars.theOrder.by.join(', ')} ${_vars.theOrder.order}` : ''));
 
-    return { vars: _vars, methods: _methods, query };
+    return [_vars, _methods, query] as [typeof _vars, typeof _methods, typeof query];
   },
 
-  withEnd: <Vars extends object, Methods extends object>(vars: Vars, methods: Methods, query: Array<(surql2: Surql2) => string>) => {
+  useEnd: <Vars extends object, Methods extends object>(vars: Vars, methods: Methods, query: Array<(surql2: Surql2) => string>) => {
     const end = async () => {
       const surql2 = new Surql2(db);
-      (await surql2.query(query.map(q => q(surql2)).join('\n'))) as T['model'][];
+      query.push(() => ';');
+      return (await surql2.query(query.map(q => q(surql2)).join('\n'))) as T['model'][];
     };
     const _methods = methods as Methods & { end: typeof end };
     _methods.end = end;
-    return { vars, methods: _methods, query };
+    return _methods;
   }
 });

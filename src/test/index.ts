@@ -50,9 +50,7 @@ function TSW(db: Surreal) {
   ).at(0);
 
   const surreality = DB(db);
-  console.log(
-    await surreality.from<Schemas.CreateHuman>({ table: 'human' }).select().fetch('mother').order('DESC', 'id').limit(5).start(0).end()
-  );
+  console.log(await surreality.from<Schemas.CreateHuman>({ table: 'human' }).select().fetch('mother').end());
   // const surql = surqlNew(db);
   // console.log((await surql`select * from ${vadid?.id} fetch mother;`).at(0));
   // console.log(tsw.select({ table: undefined }));
