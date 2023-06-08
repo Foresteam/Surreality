@@ -1,0 +1,67 @@
+{
+  "files.eol": "\n",
+  "editor.formatOnSave": false,
+  "[javacript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": [
+      "source.fixAll.format",
+      "source.fixAll.eslint"
+    ]
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": [
+      "source.fixAll.format",
+      "source.fixAll.eslint"
+    ]
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": [
+      "source.fixAll.format",
+      "source.fixAll.eslint"
+    ]
+  },
+  "[json]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[scss]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.suggest.insertMode": "replace",
+    "cSpell.fixSpellingWithRenameProvider": false
+  },
+  "[css]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.suggest.insertMode": "replace",
+    "cSpell.fixSpellingWithRenameProvider": false
+  },
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": true,
+
+  "cSpell.language": "en,ru",
+  "cSpell.words": [
+    "pinia",
+    "vite",
+    "ymaps",
+    "dadata",
+    "tilda",
+    "remify",
+    "composables"
+  ],
+  "volar.icon.splitEditors": false,
+  "vite.autoStart": false,
+  "vite.devCommand": "yarn dev",
+  "vite.buildCommand": "yarn build",
+  "vite.port": 3000,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "vue.inlayHints.inlineHandlerLeading": true,
+  "vue.inlayHints.missingProps": true,
+  "cssvar.ignore": [
+    "**/node_modules/**",
+    "./backend/**"
+  ]
+}

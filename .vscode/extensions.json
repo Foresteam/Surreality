@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "vue.volar",
+    "vue.vscode-typescript-vue-plugin",
+    "esbenp.prettier-vscode",
+    "christian-kohler.path-intellisense",
+    "sibiraj-s.vscode-scss-formatter",
+    "dbaeumer.vscode-eslint",
+    "zignd.html-css-class-completion",
+    "ecmel.vscode-html-css",
+    "bradlc.vscode-tailwindcss",
+    "formulahendry.auto-rename-tag",
+    "streetsidesoftware.code-spell-checker",
+    "streetsidesoftware.code-spell-checker-russian",
+    "rohit-gohri.format-code-action",
+    "mrmlnc.vscode-scss",
+    "phoenisx.cssvar"
+  ]
+}

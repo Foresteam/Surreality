@@ -1,0 +1,69 @@
+{
+  "root": true,
+  "globals": {
+    "defineProps": "readonly"
+  },
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": "@antfu",
+  "parserOptions": {
+    "ecmaVersion": 2021
+  },
+  "rules": {
+    "prefer-promise-reject-errors": "off",
+    "no-console": "warn",
+
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "indent": ["error", 2],
+    "linebreak-style": ["error", "unix"],
+    "dot-notation": ["error"],
+    "object-curly-spacing": [
+      "error",
+      "always",
+      { "objectsInObjects": true, "arraysInObjects": true }
+    ],
+    "comma-spacing": ["error", { "before": false, "after": true }],
+    "brace-style": ["error", "stroustrup"],
+    "nonblock-statement-body-position": ["error", "below"],
+    "arrow-parens": "off",
+    "eslint-comments/no-unlimited-disable": "off",
+
+    "semi": ["error", "always"],
+    "@typescript-eslint/semi": ["error", "always"],
+    "comma-dangle": ["error", "never"],
+    "@typescript-eslint/comma-dangle": ["error", "never"],
+    "no-mixed-operators": "off",
+    
+    "@typescript-eslint/indent": "off",
+    "antfu/top-level-function": "off",
+    
+    "vue/script-indent": ["error", 2, { "baseIndent": 0 }],
+    "vue/define-macros-order": "off",
+    "vue/comma-dangle": "off",
+    "vue/dot-location": "off",
+    "vue/object-curly-newline": "off",
+    "vue/space-unary-ops": "off",
+    "@typescript-eslint/member-delimiter-style": ["error", {
+      "multiline": {
+        "delimiter": "semi",
+        "requireLast": true
+      },
+      "singleline": {
+        "delimiter": "semi",
+        "requireLast": false
+      },
+      "multilineDetection": "brackets"
+    }]
+  },
+  "overrides": [
+    {
+      "files": "*.vue",
+      "rules": {
+        "indent": "off"
+      }
+    }
+  ]
+}

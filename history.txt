@@ -1,0 +1,12 @@
+#V2
+use namespace test;
+use database test;
+select * from human;
+select * from "human";
+using database test;
+use database test;
+use namespace test;
+select * from type::table("human") fetch mother;
+use database test;
+use namespace test;
+select * from type::table("human") fetch mother ;
