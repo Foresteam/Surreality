@@ -19,10 +19,10 @@ const db = new Surreal('http://127.0.0.1:8000/rpc');
       query: {
         name: 'Физическое лицо'
       }
-    })
+    })()
   )[0];
-  const vadid = (
-    await surreality.create({
+  const men = await surreality.transaction(
+    surreality.create({
       table: 'user',
       query: {
         name: 'Vadid',
@@ -30,8 +30,18 @@ const db = new Surreal('http://127.0.0.1:8000/rpc');
         email: 'vadid@gmail.com',
         type: phys.id
       }
+    }),
+    surreality.create({
+      table: 'user',
+      query: {
+        name: 'Vaserman',
+        surname: 'HEHEH',
+        email: 'vaserman@gmail.com',
+        type: phys.id
+      }
     })
-  )[0];
+  );
+  console.log(men);
 
   const withFetched = await surreality.select({
     from: [{ table: 'user' }],
@@ -53,10 +63,8 @@ const db = new Surreal('http://127.0.0.1:8000/rpc');
       count: 5
     },
     fetch: ['type']
-  });
+  })();
   console.log(withFetched);
 
-  // const rs = await surreality.select<Schemas.CreateHuman>({ table: 'human' }).select().fetch('mother').end();
-  // console.log(rs);
   db.close();
 })();

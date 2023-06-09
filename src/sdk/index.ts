@@ -2,6 +2,12 @@ import type Surreal from 'surrealdb.js';
 import type { PartialDeep } from 'type-fest';
 import { select } from './statements/select.js';
 import type { BasicModel, Model } from './schemas.js';
+import { transaction } from './statements/transaction.js';
+
+export interface OperationType<T> {
+  (surql2?: Surql2): Promise<T>;
+  query: Array<(surql2: Surql2) => string>;
+}
 
 type Surql2Arg = string | number | undefined | null | symbol;
 export class Surql2 {
@@ -40,8 +46,16 @@ export const DB = <Create extends Model<object, string>, Tables extends string>(
   create: <Table extends Tables, C = Extract<Create, { table: Table }>['model']>(args: {
     table: Table;
     query: Omit<C, keyof BasicModel> & Partial<BasicModel>;
-  }) =>
-    db.create(args.table, { createdAt: Date.now(), ...args.query } as object as Record<string, unknown>) as Promise<object> as Promise<C[]>,
+  }): OperationType<C[]> => {
+    const _surql2 = new Surql2(db);
+    const query = [
+      (surql2: Surql2) => /* surrealql */ `create type::table(${surql2.interpolate(args.table)}) content ${JSON.stringify(args.query)};`
+    ];
+    const f: OperationType<C[]> = (surql2: Surql2 = _surql2) => surql2.query(query.map(q => q(surql2)).join('\n')) as Promise<C[]>;
+    f.query = query;
+    return f;
+  },
   merge: <T extends Model<object, string>>(args: Omit<T, 'model'> & { query: PartialDeep<T['model']> }): Promise<T['model'][]> =>
-    db.merge(args.table, args.query as object as Record<string, unknown>) as Promise<object> as Promise<T['model'][]>
+    db.merge(args.table, args.query as object as Record<string, unknown>) as Promise<object> as Promise<T['model'][]>,
+  transaction: transaction(db)
 });
