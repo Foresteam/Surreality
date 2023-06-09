@@ -1,15 +1,22 @@
-import type { Model } from '../sdk/schemas';
+import type { BasicModel, Model } from '../sdk/schemas';
 
-export interface Human {
-  id: string;
+export interface UserType extends BasicModel {
+  name: 'Физическое лицо' | 'Банк' | 'Страховая' | 'Застройщик' | 'Риелтор';
+}
+export type CreateUserType = Model<UserType, 'userType'>;
+
+export interface User extends BasicModel {
   name: string;
   surname: string;
-  mother: Human | null;
+  patronymic?: string;
+  companyName?: string;
+  email: string;
+  authToken?: string;
+  phone?: string;
+  public?: boolean;
+  type: UserType | string;
 }
-export interface Orphan extends Human {
-  mother: null;
-}
-export interface CreateHuman extends Model<Human> {
-  table: 'human';
-}
-export type create = CreateHuman;
+export type CreateUser = Model<User, 'user'>;
+
+export type create = CreateUser | CreateUserType;
+export type Tables = create['table'];

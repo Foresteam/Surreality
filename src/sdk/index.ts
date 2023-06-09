@@ -1,6 +1,7 @@
 import type Surreal from 'surrealdb.js';
-import { from } from './statements/select.js';
-import type { Model } from './schemas.js';
+import type { PartialDeep } from 'type-fest';
+import { select } from './statements/select.js';
+import type { BasicModel, Model } from './schemas.js';
 
 type Surql2Arg = string | number | undefined | null | symbol;
 export class Surql2 {
@@ -25,20 +26,8 @@ export class Surql2 {
   }
 }
 
-type FilterUndefined<T extends any[]> = T extends []
-  ? []
-  : T extends [infer H, ...infer R]
-  ? H extends undefined
-    ? FilterUndefined<R>
-    : [H, ...FilterUndefined<R>]
-  : T;
-type UndefIndex<T extends any[], I extends number> = {
-  [P in keyof T]: P extends Exclude<keyof T, keyof any[]> ? (P extends `${I}` ? undefined : T[P]) : T[P];
-};
-type SpliceTuple<T extends any[], I extends number> = FilterUndefined<UndefIndex<T, I>>;
-
-export const DB = <Create extends Model<object>>(db: Surreal) => ({
-  from: from(db),
+export const DB = <Create extends Model<object, string>, Tables extends string>(db: Surreal) => ({
+  select: select<Tables, Create>(db),
   surql: <T>(template: TemplateStringsArray, ...args: (string | number | undefined | null)[]): Promise<T[]> => {
     let t = template[0];
     for (let i = 0; i < args.length; i++)
@@ -48,11 +37,11 @@ export const DB = <Create extends Model<object>>(db: Surreal) => ({
       T[]
     >;
   },
-  create: <T extends Create, C extends T['model']>(args: {
-    table: T['table'];
-    query: Omit<C, 'id'> & { id?: string };
-  }): Promise<T['model'][]> =>
-    db.create(args.table, args.query as object as Record<string, unknown>) as Promise<object> as Promise<T['model'][]>,
-  merge: <T extends Create>(args: Omit<T, 'model'> & { query: Partial<T['model']> }): Promise<T['model'][]> =>
+  create: <Table extends Tables, C = Extract<Create, { table: Table }>['model']>(args: {
+    table: Table;
+    query: Omit<C, keyof BasicModel> & Partial<BasicModel>;
+  }) =>
+    db.create(args.table, { createdAt: Date.now(), ...args.query } as object as Record<string, unknown>) as Promise<object> as Promise<C[]>,
+  merge: <T extends Model<object, string>>(args: Omit<T, 'model'> & { query: PartialDeep<T['model']> }): Promise<T['model'][]> =>
     db.merge(args.table, args.query as object as Record<string, unknown>) as Promise<object> as Promise<T['model'][]>
 });

@@ -11,64 +11,52 @@ const db = new Surreal('http://127.0.0.1:8000/rpc');
   });
   await db.use({ db: 'test', ns: 'test' });
 
-  const surreality = DB<Schemas.create>(db);
-  const mom = (
-    await surreality.create<Schemas.CreateHuman, Schemas.Orphan>({
-      table: 'human',
+  const surreality = DB<Schemas.create, Schemas.Tables>(db);
+
+  const phys = (
+    await surreality.create({
+      table: 'userType',
       query: {
-        name: 'The',
-        surname: 'Mon',
-        mother: null
+        name: 'Физическое лицо'
       }
     })
-  ).at(0);
+  )[0];
   const vadid = (
     await surreality.create({
-      table: 'human',
+      table: 'user',
       query: {
-        name: 'The',
-        surname: 'Vadid',
-        mother: mom?.id as unknown as null
+        name: 'Vadid',
+        surname: 'Tyhe',
+        email: 'vadid@gmail.com',
+        type: phys.id
       }
     })
-  ).at(0);
+  )[0];
 
-  console.log(await surreality.from<Schemas.CreateHuman>({ table: 'human' }).select().fetch('mother').end());
-  // const surql = surqlNew(db);
-  // console.log((await surql`select * from ${vadid?.id} fetch mother;`).at(0));
-  // console.log(tsw.select({ table: undefined }));
-  // const me = await db.create('person', {
-  //   name: {
-  //     first: 'Sir',
-  //     last: 'McNuggets'
-  //   },
-  //   job: 'Bug generation'
-  // });
-  // const another = await db.create('person', {
-  //   name: {
-  //     first: 'Vaser',
-  //     last: 'Man'
-  //   },
-  //   job: 'Bug generation'
-  // });
-  // await db.create('person', {
-  //   name: {
-  //     first: 'Sex',
-  //     last: 'Server'
-  //   },
-  //   job: 'Bug themselves'
-  // });
-  // const ws = await db.create('workspace', {
-  //   name: 'A workspace',
-  //   people: []
-  // });
-  // (ws[0].people as typeof me).push(me[0]);
-  // (ws[0].people as typeof me).push(another[0]);
-  // console.log(ws);
-  // await db.update(ws[0].id, ws[0]);
+  const withFetched = await surreality.select({
+    from: [{ table: 'user' }],
+    fields: {
+      name: true,
+      email: true,
+      type: {
+        name: true
+      },
+      createdAt: true
+    },
+    order: [
+      {
+        sort: 'DESC',
+        by: 'createdAt'
+      }
+    ],
+    pagination: {
+      count: 5
+    },
+    fetch: ['type']
+  });
+  console.log(withFetched);
 
-  // console.log((await db.select('workspace')).map(r => r?.people));
-  // await surql(db)`update person:q3amsg9d9wb7asdh8l23 set name.first = type::string(${'first'});`;
-  // console.log((await db.select('person:q3amsg9d9wb7asdh8l23')).at(0)?.name);
+  // const rs = await surreality.select<Schemas.CreateHuman>({ table: 'human' }).select().fetch('mother').end();
+  // console.log(rs);
   db.close();
 })();
