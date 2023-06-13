@@ -9,7 +9,7 @@ export interface OperationType<T> {
   query: Array<(surql2: Surql2) => string>;
 }
 
-type Surql2Arg = string | number | undefined | null | symbol;
+export type Surql2Arg = string | number | undefined | null | symbol;
 export class Surql2 {
   #args: Record<string, Surql2Arg>;
   db: Surreal;

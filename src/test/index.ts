@@ -62,7 +62,17 @@ const db = new Surreal('http://127.0.0.1:8000/rpc');
     pagination: {
       count: 5
     },
-    fetch: ['type']
+    fetch: ['type'],
+    where: [
+      [
+        {
+          value: <keyof Schemas.User>'name',
+          interpolate: false
+        },
+        '=',
+        'Vaserman'
+      ]
+    ]
   })();
   console.log(withFetched);
 
