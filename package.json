@@ -1,9 +1,14 @@
 {
   "name": "surreality",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/sdk/index.js",
   "type": "module",
   "license": "MIT",
+  "scripts": {
+    "build": "rm -rf dist; npx tsc",
+    "prepublish": "npm run build",
+    "test": "npx ts-node-esm src/test/index.ts"
+  },
   "dependencies": {
     "surrealdb.js": "^0.8.0",
     "zod": "^3.21.4"

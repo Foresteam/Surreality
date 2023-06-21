@@ -1,8 +1,9 @@
 import type { Surreal } from 'surrealdb.js';
 import type { PartialDeep } from 'type-fest';
 import { Surql2 } from '../index.js';
-import type { OperationType, Surql2Arg } from '../index.js';
+import type { OperationType } from '../index.js';
 import type { Model } from '../schemas.js';
+import { type WhereInput, withWhere } from './composables/withWhere.js';
 
 type ToBooleanish<T extends object> = { [key in keyof T]: T[key] extends object ? ToBooleanish<T[key]> | boolean : boolean };
 interface Booleanish {
@@ -25,10 +26,7 @@ export type FetchedEntry<M extends object, Key extends keyof M> = {
   [key in keyof M]: key extends Key ? Exclude<M[key], string> : M[key];
 };
 
-type WhereSelectArg = Surql2Arg | { value: Surql2Arg; interpolate: boolean };
-
-export const select
-  = <Tables extends string, Create extends Model<object, string>>(db: Surreal) =>
+export default <Tables extends string, Create extends Model<object, string>>(db: Surreal) =>
   <
     Table extends Tables,
     M extends Extract<Create, { table: Table }>['model'],
@@ -46,11 +44,7 @@ export const select
       sort: 'ASC' | 'DESC';
       by: keyof M;
     }[];
-    where?: {
-      0: WhereSelectArg;
-      1: '=' | '>' | '<' | '<=' | '>=' | '!=';
-      2?: WhereSelectArg | undefined;
-    }[];
+    where?: WhereInput;
   }): OperationType<MFetched[]> => {
     const _surql2 = new Surql2(db);
     const query: ((surql2: Surql2) => string)[] = [];
@@ -62,26 +56,7 @@ export const select
           ${params.from.map(v => (v.id ? surql2.interpolate(v.id) : `type::table(${surql2.interpolate(v.table)})`))}
         `
     );
-    const processInterpolation = (surql2: Surql2, arg?: WhereSelectArg) => {
-      const objArg = arg as Exclude<WhereSelectArg, Surql2Arg> | undefined;
-      const value = (objArg?.interpolate !== undefined ? objArg?.value : arg) as Surql2Arg | undefined;
-      if (objArg?.interpolate === false)
-        return value;
-      if (typeof value === 'number') {
-        if (value.toString().includes('.'))
-          return `type::float(${surql2.interpolate(value)})`;
-        else
-          return `type::int(${surql2.interpolate(value)})`;
-      }
-      return surql2.interpolate(value);
-    };
-    query.push(surql2 =>
-      params.where
-        ? /* surrealql */ `where ${params.where
-          .map(v => [processInterpolation(surql2, v[0]), v[1], processInterpolation(surql2, v[2])].filter(v => !!v).join(' '))
-          .join(', ')}`
-        : ''
-    );
+    withWhere(query, params);
     query.push(() => (params.order ? /* surrealql */ `order by ${params.order.map(v => `${String(v.by)} ${v.sort}`).join(', ')}` : ''));
     query.push(() => (params.pagination?.count ? /* surrealql */ `limit ${params.pagination?.count}` : ''));
     query.push(() => (params.pagination?.start ? /* surrealql */ `start at ${params.pagination?.start}` : ''));

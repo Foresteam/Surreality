@@ -1,6 +1,7 @@
 import type Surreal from 'surrealdb.js';
 import type { PartialDeep } from 'type-fest';
-import { select } from './statements/select.js';
+import select from './statements/select.js';
+import delete_ from './statements/delete.js';
 import type { BasicModel, Model } from './schemas.js';
 import { transaction } from './statements/transaction.js';
 
@@ -32,8 +33,9 @@ export class Surql2 {
   }
 }
 
-export const DB = <Create extends Model<object, string>, Tables extends string>(db: Surreal) => ({
+export const SDK = <Create extends Model<object, string>, Tables extends string>(db: Surreal) => ({
   select: select<Tables, Create>(db),
+  delete: delete_<Tables>(db),
   surql: <T>(template: TemplateStringsArray, ...args: (string | number | undefined | null)[]): Promise<T[]> => {
     let t = template[0];
     for (let i = 0; i < args.length; i++)
@@ -59,3 +61,5 @@ export const DB = <Create extends Model<object, string>, Tables extends string>(
     db.merge(args.table, args.query as object as Record<string, unknown>) as Promise<object> as Promise<T['model'][]>,
   transaction: transaction(db)
 });
+
+export * from './schemas.js';

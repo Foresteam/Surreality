@@ -10,7 +10,8 @@
     "isolatedModules": true,
     "strict": true,
     "jsx": "preserve",
-    "sourceMap": false,
+    "sourceMap": true,
+    "declaration": true,
     "baseUrl": ".",
     "outDir": "./dist"
   },

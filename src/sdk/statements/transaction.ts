@@ -14,5 +14,5 @@ export const transaction
         'commit transaction;'
       ];
 
-      return (await surql2.query(qs.join('\n '))) as ReturnType<QF>;
+      return (await surql2.query(qs.join('\n '))) as ReturnType<Awaited<QF>>;
     };

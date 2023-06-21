@@ -1,8 +1,8 @@
 import Surreal from 'surrealdb.js';
-import { DB } from '../sdk/index.js';
+import { SDK } from '../sdk/index.js';
 import type * as Schemas from './schemas.js';
 
-const db = new Surreal('http://127.0.0.1:8000/rpc');
+const db = new Surreal('http://127.0.0.1:3500/rpc');
 
 (async () => {
   await db.signin({
@@ -11,7 +11,7 @@ const db = new Surreal('http://127.0.0.1:8000/rpc');
   });
   await db.use({ db: 'test', ns: 'test' });
 
-  const surreality = DB<Schemas.create, Schemas.Tables>(db);
+  const surreality = SDK<Schemas.create, Schemas.Tables>(db);
 
   const phys = (
     await surreality.create({
@@ -75,6 +75,12 @@ const db = new Surreal('http://127.0.0.1:8000/rpc');
     ]
   })();
   console.log(withFetched);
+  console.log(
+    await surreality.delete({
+      targets: [{ table: 'user' }],
+      where: [[{ value: <keyof Schemas.User>'name', interpolate: false }, '=', 'Vadid']]
+    })()
+  );
 
   db.close();
 })();
