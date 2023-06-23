@@ -12,6 +12,7 @@ const db = new Surreal('http://127.0.0.1:3500/rpc');
   await db.use({ db: 'test', ns: 'test' });
 
   const surreality = SDK<Schemas.create, Schemas.Tables, Schemas.Relations>(db);
+  // const surql = surreality.surql;
 
   const phys = (
     await surreality.create({

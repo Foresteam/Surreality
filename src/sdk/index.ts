@@ -44,7 +44,7 @@ export const SDK = <
 >(
     db: Surreal
   ) => ({
-    select: select<Tables, Create>(db),
+    select: select<Tables, Create, Relations>(db),
     delete: delete_<Tables>(db),
     surql: <T>(template: TemplateStringsArray, ...args: (string | number | undefined | null)[]): Promise<T[]> => {
       let t = template[0];

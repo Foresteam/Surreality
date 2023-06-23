@@ -2,7 +2,7 @@ import type { Surreal } from 'surrealdb.js';
 import type { PartialDeep } from 'type-fest';
 import { Surql2 } from '../index.js';
 import type { OperationType } from '../index.js';
-import type { Model } from '../schemas.js';
+import type { Model, Relation } from '../schemas.js';
 import { type WhereInput, withWhere } from './composables/withWhere.js';
 
 type ToBooleanish<T extends object> = { [key in keyof T]: T[key] extends object ? ToBooleanish<T[key]> | boolean : boolean };
@@ -26,15 +26,23 @@ export type FetchedEntry<M extends object, Key extends keyof M> = {
   [key in keyof M]: key extends Key ? Exclude<M[key], string> : M[key];
 };
 
-export default <Tables extends string, Create extends Model<object, string>>(db: Surreal) =>
+export default <
+    Tables extends string,
+    Create extends Model<object, string>,
+    Relations extends Relation<string, Model<object, string>, Model<object, string>>
+  >(
+  db: Surreal
+) =>
   <
     Table extends Tables,
     M extends Extract<Create, { table: Table }>['model'],
     FetchKeys extends keyof M,
-    MFetched extends FetchedEntry<M, FetchKeys>
+    MFetched extends FetchedEntry<M, FetchKeys>,
+    Relation extends Relations
   >(params: {
     from: { table: Table; id?: string }[];
     fields?: true | PartialDeep<ToBooleanish<MFetched>>;
+    relations?: `${Relation['name']}->` | `<-${Relation['name']}`;
     fetch?: FetchKeys[];
     pagination?: {
       start?: number;
