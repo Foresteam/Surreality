@@ -7,3 +7,4 @@ A SurrealDB SDK, which provides schemas and strict types. The purpose was to bri
 * **create** (basic) ✅
 * **merge** 100%?
 * **relations** planned
+* **relate** works.

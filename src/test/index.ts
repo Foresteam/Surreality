@@ -11,7 +11,7 @@ const db = new Surreal('http://127.0.0.1:3500/rpc');
   });
   await db.use({ db: 'test', ns: 'test' });
 
-  const surreality = SDK<Schemas.create, Schemas.Tables>(db);
+  const surreality = SDK<Schemas.create, Schemas.Tables, Schemas.Relations>(db);
 
   const phys = (
     await surreality.create({
@@ -78,7 +78,18 @@ const db = new Surreal('http://127.0.0.1:3500/rpc');
   console.log(
     await surreality.delete({
       targets: [{ table: 'user' }],
-      where: [[{ value: <keyof Schemas.User>'name', interpolate: false }, '=', 'Vadid']]
+      where: [[{ value: <keyof Schemas.User>'name', interpolate: false }, '=', 'Vaserman']]
+    })()
+  );
+
+  console.log(
+    await surreality.relate({
+      relation: 'ofType',
+      in: { table: 'user', ids: [men[0].id] },
+      out: { table: 'userType', ids: [phys.id] },
+      content: {
+        testField: 47
+      }
     })()
   );
 
